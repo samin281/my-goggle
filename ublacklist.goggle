@@ -36,7 +36,6 @@ $discard,site=pinterest.fr
 $discard,site=play.google.com
 $discard,site=primevideo.com
 $discard,site=quora.com
-$discard,site=reuters.com
 $discard,site=scribd.com
 $discard,site=softonic.com
 $discard,site=softpedia.com
@@ -74,6 +73,7 @@ $boost=1,site=geeksforgeeks.org
 $boost=1,site=github.com
 $boost=1,site=gitlab.com
 $boost=1,site=medium.com
+$boost=3,site=reuters.com
 $boost=1,site=stackoverflow.com
 $boost=1,site=superuser.com
 $boost=1,site=support.mozilla.org
