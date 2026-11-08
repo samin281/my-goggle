@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Goggle Manager</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--tx:#14181f;--mut:#667085;--bd:#e2e5ea;--ac:#4f46e5;--acx:#fff;--blk:#dc2626;--low:#d97706;--rai:#16a34a;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1014;--card:#171a21;--tx:#e8eaee;--mut:#98a2b3;--bd:#2a2f3a;--ac:#8b93ff;--acx:#10121a;--blk:#f87171;--low:#fbbf24;--rai:#4ade80}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:env(safe-area-inset-top,0) 0 calc(84px + env(safe-area-inset-bottom,0))}
+main{max-width:640px;margin:0 auto;padding:12px}
+header{display:flex;align-items:center;gap:10px;margin:4px 0 12px}
+h1{font-size:20px;margin:0;flex:1}h2{font-size:13px;margin:0 0 8px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+input,textarea,select{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit}
+textarea{resize:vertical;min-height:64px}label{display:block;font-size:12px;color:var(--mut);margin:8px 0 3px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:9px 12px}
+.pri{background:var(--ac);color:var(--acx);border-color:var(--ac);font-weight:600}.pri:disabled{opacity:.4;cursor:default}
+.icon{width:40px;padding:8px}
+.seg{display:flex;border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+.seg button{flex:1;border:0;border-radius:0;background:transparent;color:var(--mut);padding:8px 6px;font-size:13px}
+.seg .block.on{background:var(--blk);color:#fff}.seg .lower.on{background:var(--low);color:#111}.seg .raise.on{background:var(--rai);color:#06130b}
+.bar{height:6px;background:var(--bd);border-radius:6px;overflow:hidden;margin:4px 0 10px}.bar i{display:block;height:100%;background:var(--ac)}.bar i.w{background:var(--low)}.bar i.x{background:var(--blk)}
+.stat{display:flex;justify-content:space-between;font-size:13px;color:var(--mut)}.stat b{color:var(--tx)}
+.chips{display:flex;gap:6px;overflow-x:auto;margin:10px 0}.chips button{border-radius:20px;padding:6px 12px;font-size:13px;white-space:nowrap}.chips .on{background:var(--ac);color:var(--acx);border-color:var(--ac)}
+.row{display:grid;grid-template-columns:1fr 40px;gap:6px 8px;padding:10px 0;border-top:1px solid var(--bd)}
+.row:first-child{border-top:0}.dom{grid-column:1/-1;font-weight:600;word-break:break-all}.dom em{font-style:normal;font-size:11px;color:var(--ac);margin-left:6px}
+.lv{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mut)}.lv button{padding:4px 14px;border-radius:8px;font-size:13px}.lv .on{background:var(--rai);color:#06130b;border-color:var(--rai)}
+.del{color:var(--blk)}.empty,.hint{color:var(--mut);font-size:13px}.hint a{color:var(--ac)}
+.save{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--bd);padding:10px 12px calc(10px + env(safe-area-inset-bottom,0))}
+.save div{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}.save span{flex:1;font-size:13px;color:var(--mut)}
+.msg{padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:12px;background:var(--card);border:1px solid var(--bd)}.msg.err{border-color:var(--blk);color:var(--blk)}.msg.ok{border-color:var(--rai)}
+.msg button{margin:6px 6px 0 0;padding:6px 10px;font-size:12px}
+[hidden]{display:none!important}
+</style></head><body><main>
+<header><h1>Goggle Manager</h1><button class="icon" id="gear" title="GitHub settings" aria-label="GitHub settings">⚙</button></header>
+<div id="msg" class="msg" hidden></div>
+
+<section class="card" id="conn" hidden>
+ <h2>GitHub connection</h2>
+ <div class="g2"><div><label>Owner</label><input id="owner" autocapitalize="none" placeholder="your-username"></div><div><label>Repository</label><input id="repo" autocapitalize="none" placeholder="my-goggle"></div></div>
+ <div class="g2"><div><label>File path</label><input id="path" autocapitalize="none"></div><div><label>Branch</label><input id="branch" autocapitalize="none"></div></div>
+ <label>Access token (fine-grained, Contents: read &amp; write on this repo only)</label><input id="token" type="password" autocomplete="off" placeholder="github_pat_…">
+ <div class="g2"><div><label>Lower strength (1–10)</label><input id="low" type="number" min="1" max="10"></div><div><label>Default raise level (1–10)</label><input id="raise" type="number" min="1" max="10"></div></div>
+ <p class="hint">The token stays in this browser’s storage and is only sent to api.github.com. <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Create one</a>.</p>
+ <button class="pri" id="load">Save &amp; load from GitHub</button>
+</section>
+
+<section class="card" id="stats" hidden>
+ <div class="stat"><span>Rules</span><span><b id="sc">0</b> / 100,000</span></div><div class="bar"><i id="bc"></i></div>
+ <div class="stat"><span>File size</span><span><b id="sb">0</b> / 2 MB</span></div><div class="bar" style="margin-bottom:0"><i id="bb"></i></div>
+</section>
+
+<section class="card" id="add" hidden>
+ <h2>Add sites</h2>
+ <textarea id="dom" placeholder="example.com — paste one or many (URLs are fine)"></textarea>
+ <div class="seg" id="addseg" style="margin:10px 0"><button class="block on" data-a="block">Block</button><button class="lower" data-a="lower">Lower</button><button class="raise" data-a="raise">Raise</button></div>
+ <div class="lv" id="addlv" hidden style="margin-bottom:10px"></div>
+ <button class="pri" id="addbtn" style="width:100%">Add</button>
+</section>
+
+<section class="card" id="listc" hidden>
+ <h2>My site rules</h2>
+ <input id="q" type="search" placeholder="Search domains">
+ <div class="chips" id="chips"></div>
+ <div id="list"></div>
+</section>
+</main>
+<div class="save" id="savebar" hidden><div><span id="chg">No changes</span><button id="reload">Reload</button><button class="pri" id="save">Save to GitHub</button></div></div>
+
+<script>
+const $=s=>document.querySelector(s),API='https://api.github.com',RULE=/^\$(discard|boost(?:=(\d+))?|downrank(?:=(\d+))?),site=(\S+)$/;
+const LBL={block:'Block',lower:'Lower',raise:'Raise'},ORD={block:0,lower:1,raise:2},enc=new TextEncoder();
+const LS={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
+let cfg={owner:'',repo:'',path:'ublacklist.goggle',branch:'main',token:'',low:3,raise:1};
+try{Object.assign(cfg,JSON.parse(LS.get('gm')||'{}'))}catch{}
+const DEF='! name: My Goggle\n! description: Managed with Goggle Manager\n! public: false\n! author: me';
+let S={rules:new Map(),orig:new Map(),head:DEF,rest:'',extra:[],sha:null,rb:0,rc:0,filter:'all',act:'block',lv:cfg.raise,on:false};
+
+const levels=n=>[...new Set([1,2,3,n])].sort((a,b)=>a-b);
+const lvBtns=n=>'Raise level '+levels(n).map(v=>`<button data-lv="${v}" class="${v===n?'on':''}">${v}</button>`).join('');
+const BRAVE='https://search.brave.com/api/goggles/submit?url=';let subTok=0;
+const setSub=t=>{const e=$('#sub');if(e)e.textContent=t};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function sendBrave(){await fetch(BRAVE+encodeURIComponent(rawUrl()),{method:'POST',mode:'no-cors',credentials:'omit'})}
+async function manualSend(){try{await sendBrave();setSub('Sent to Brave. Its reply can’t be read from this page, so check a changed site in a goggle search.')}catch(e){setSub('Could not send: '+e.message)}}
+async function autoSubmit(text){const me=++subTok;
+ for(let i=1;i<=20;i++){if(me!==subTok)return;
+  try{const r=await fetch(rawUrl(),{cache:'no-store'});if(r.ok&&(await r.text())===text){setSub('GitHub is up to date — sending to Brave…');await manualSend();return}}catch{}
+  setSub(`Waiting for GitHub to publish the new file… (${i}/20, keep this page open)`);await wait(20000)}
+ setSub('GitHub is slow to publish. Tap “Submit to Brave now” in a few minutes.')}
+function msg(t,cls='',html=false){const m=$('#msg');m.className='msg '+cls;m[html?'innerHTML':'textContent']=t;m.hidden=!t}
+const H=(acc)=>({Authorization:'Bearer '+cfg.token,Accept:acc||'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'});
+async function gh(p,o={}){const r=await fetch(API+p,o);if(!r.ok){let m='';try{m=(await r.json()).message}catch{}const e=new Error(r.status+' '+(m||r.statusText));e.status=r.status;throw e}return r}
+const fp=()=>`/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path.split('/').map(encodeURIComponent).join('/')}`;
+function b64(s){const b=enc.encode(s);let o='';for(let i=0;i<b.length;i+=32768)o+=String.fromCharCode.apply(null,b.subarray(i,i+32768));return btoa(o)}
+const rawUrl=()=>`https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/refs/heads/${cfg.branch}/${cfg.path}`;
+
+function parse(text){
+ const L=text.split('\n'),idx=[];L.forEach((l,i)=>{if(l.startsWith('! ====='))idx.push(i)});
+ S.head=(L.slice(0,idx.length?idx[0]:L.length).join('\n').trimEnd())||DEF;S.rules=new Map();S.extra=[];const keep=[];
+ idx.forEach((a,k)=>{const b=k+1<idx.length?idx[k+1]:L.length;
+  if(/^! ===== (Your personal|Brave Search site rules|My site rules)/.test(L[a])){
+   for(let i=a+1;i<b;i++){const l=L[i].trim();if(!l||l[0]==='!')continue;const m=RULE.exec(l);
+    if(m)S.rules.set(m[4],m[1]==='discard'?{a:'block'}:m[1][0]==='b'?{a:'raise',n:+(m[2]||1)}:{a:'lower',n:+(m[3]||1)});else S.extra.push(l)}
+  }else keep.push(L.slice(a,b).join('\n'))});
+ S.rest=keep.join('\n').trim();S.orig=new Map([...S.rules].map(([d,r])=>[d,{...r}]));countRest()}
+function countRest(){S.rb=enc.encode(S.rest).length;S.rc=0;for(const l of S.rest.split('\n'))if(l&&l[0]!=='!')S.rc++}
+const line=(d,r)=>r.a==='block'?`$discard,site=${d}`:r.a==='raise'?`$boost=${r.n||cfg.raise},site=${d}`:`$downrank=${r.n||cfg.low},site=${d}`;
+const sorted=()=>[...S.rules].sort((x,y)=>ORD[x[1].a]-ORD[y[1].a]||x[0].localeCompare(y[0]));
+function stripped(){const s=new Set([...S.rules].filter(([,r])=>r.a!=='block').map(([d])=>d));let n=0;
+ const out=S.rest.split('\n').filter(l=>{if(l.startsWith('$discard,site=')&&s.has(l.slice(14))){n++;return false}return true});return[out.join('\n'),n]}
+function build(rest){return S.head+'\n\n! ===== My site rules (Block / Lower / Raise) =====\n'+sorted().map(([d,r])=>line(d,r)).concat(S.extra).join('\n')+'\n\n'+rest+'\n'}
+function changes(){let c=0;for(const[d,r]of S.rules){const o=S.orig.get(d);if(!o||o.a!==r.a||(o.n||0)!==(r.n||0))c++}for(const d of S.orig.keys())if(!S.rules.has(d))c++;return c}
+
+function render(){
+ const has=S.on;['stats','add','listc','savebar'].forEach(i=>$('#'+i).hidden=!has);if(!has)return;
+ const q=$('#q').value.trim().toLowerCase(),cnt={all:S.rules.size,block:0,lower:0,raise:0};for(const[,r]of S.rules)cnt[r.a]++;
+ $('#chips').innerHTML=['all','block','lower','raise'].map(k=>`<button data-f="${k}" class="${S.filter===k?'on':''}">${k==='all'?'All':LBL[k]} ${cnt[k]}</button>`).join('');
+ const rows=sorted().filter(([d,r])=>(S.filter==='all'||r.a===S.filter)&&d.includes(q));
+ $('#list').innerHTML=rows.map(([d,r])=>{const o=S.orig.get(d),tag=!o?'new':(o.a!==r.a||(o.n||0)!==(r.n||0))?'edited':'';
+  return `<div class="row"><div class="dom">${d}${tag?`<em>${tag}</em>`:''}</div><div class="seg" data-d="${d}">${['block','lower','raise'].map(a=>`<button data-a="${a}" class="${a}${r.a===a?' on':''}">${LBL[a]}</button>`).join('')}</div><button class="del icon" data-del="${d}" aria-label="Remove ${d}">✕</button>${r.a==='raise'?`<div class="lv" data-d="${d}">${lvBtns(r.n||1)}</div>`:''}</div>`}).join('')||'<p class="empty">No rules here yet.</p>';
+ const n=sorted().length+S.extra.length+S.rc,by=enc.encode(build(S.rest)).length-0,c=changes();
+ $('#sc').textContent=n.toLocaleString();$('#sb').textContent=(by/1048576).toFixed(2)+' MB';
+ const pc=n/1e5,pb=by/2097152;$('#bc').style.width=Math.min(pc,1)*100+'%';$('#bb').style.width=Math.min(pb,1)*100+'%';
+ $('#bc').className=pc>1?'x':pc>.95?'w':'';$('#bb').className=pb>1?'x':pb>.95?'w':'';
+ const over=pc>1||pb>1;$('#chg').textContent=over?'Over Brave’s limit — remove some rules':c?`${c} unsaved change${c>1?'s':''}`:'No changes';
+ $('#save').disabled=!c||over;
+}
+async function load(){
+ if(!cfg.owner||!cfg.repo||!cfg.token){$('#conn').hidden=false;return}
+ msg('Loading from GitHub…');
+ try{let meta=null;try{meta=await(await gh(fp()+'?ref='+encodeURIComponent(cfg.branch),{headers:H()})).json()}catch(e){if(e.status!==404)throw e}
+  if(meta){S.sha=meta.sha;parse(await(await gh(`/repos/${cfg.owner}/${cfg.repo}/git/blobs/${meta.sha}`,{headers:H('application/vnd.github.raw+json')})).text());msg('')}
+  else{S.sha=null;S.rest='';S.rules=new Map();S.orig=new Map();S.extra=[];S.head=DEF;countRest();msg('File not found — it will be created on your first save.','ok')}
+  S.on=true;$('#conn').hidden=true;render()}
+ catch(e){S.on=false;render();$('#conn').hidden=false;msg('Could not load: '+e.message+(e.status===401||e.status===403?' (check the token and its permissions)':''),'err')}
+}
+async function save(){
+ const btn=$('#save');btn.disabled=true;btn.textContent='Saving…';
+ try{const[rest,n]=stripped(),text=build(rest);
+  const body={message:'Update goggle rules via Goggle Manager',content:b64(text),branch:cfg.branch};if(S.sha)body.sha=S.sha;
+  const r=await(await gh(fp(),{method:'PUT',headers:{...H(),'Content-Type':'application/json'},body:JSON.stringify(body)})).json();
+  S.sha=r.content.sha;S.rest=rest;countRest();S.orig=new Map([...S.rules].map(([d,x])=>[d,{...x}]));
+  msg(`Saved to GitHub ✓${n?` (removed ${n} conflicting block${n>1?'s':''} from the big lists so Lower/Raise take effect)`:''}<br>Brave doesn’t re-check goggles on its own, so this page sends the update once GitHub has published it.<br><b id="sub">Starting…</b><br><button id="sb">Submit to Brave now</button><button id="cp">Copy raw URL</button><a href="https://search.brave.com/goggles/create" target="_blank" rel="noopener"><button>Open Brave submit page</button></a>`,'ok',true);
+  $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(rawUrl());$('#cp').textContent='Copied ✓'}catch{prompt('Copy this URL',rawUrl())}};
+  $('#sb').onclick=manualSend;autoSubmit(text);
+ }catch(e){msg('Save failed: '+e.message+(e.status===409||e.status===422?' — the file changed on GitHub; tap Reload (your edits will be lost).':''),'err')}
+ btn.textContent='Save to GitHub';render();
+}
+function normDomain(s){s=s.trim().toLowerCase().replace(/^[a-z]+:\/\//,'').replace(/^www\./,'').split(/[\/?#:]/)[0];return/^[a-z0-9_-]+(\.[a-z0-9_-]+)+$/.test(s)?s:null}
+
+$('#gear').onclick=()=>{const c=$('#conn');c.hidden=!c.hidden;if(!c.hidden)['owner','repo','path','branch','token','low','raise'].forEach(k=>$('#'+k).value=cfg[k])};
+$('#load').onclick=()=>{['owner','repo','path','branch','token'].forEach(k=>cfg[k]=$('#'+k).value.trim());
+ cfg.low=Math.min(10,Math.max(1,+$('#low').value||3));cfg.raise=Math.min(10,Math.max(1,+$('#raise').value||1));LS.set('gm',JSON.stringify(cfg));S.lv=cfg.raise;addLv();load()};
+$('#reload').onclick=()=>{if(!changes()||confirm('Discard unsaved changes and reload from GitHub?'))load()};
+$('#save').onclick=save;$('#q').oninput=render;
+$('#addseg').onclick=e=>{const a=e.target.dataset.a;if(!a)return;S.act=a;[...$('#addseg').children].forEach(b=>b.classList.toggle('on',b.dataset.a===a));$('#addlv').hidden=a!=='raise';addLv()};
+function addLv(){$('#addlv').innerHTML=lvBtns(S.lv)}
+$('#addlv').onclick=e=>{const v=+e.target.dataset.lv;if(v){S.lv=v;addLv()}};addLv();
+$('#addbtn').onclick=()=>{const ds=$('#dom').value.split(/[\s,;]+/).filter(Boolean).map(normDomain);const ok=ds.filter(Boolean),bad=ds.length-ok.length;
+ ok.forEach(d=>S.rules.set(d,S.act==='block'?{a:'block'}:{a:S.act,n:S.act==='raise'?S.lv:cfg.low}));
+ $('#dom').value='';msg(ok.length?`Added ${new Set(ok).size} site${ok.length>1?'s':''} as ${LBL[S.act]}${bad?` · skipped ${bad} invalid`:''}`:(bad?'No valid domains found':''),ok.length?'ok':'err');render()};
+$('#chips').onclick=e=>{if(e.target.dataset.f){S.filter=e.target.dataset.f;render()}};
+$('#list').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.del){S.rules.delete(b.dataset.del)}else if(b.dataset.lv){S.rules.get(b.closest('.lv').dataset.d).n=+b.dataset.lv}else if(b.dataset.a){const d=b.closest('.seg').dataset.d,r=S.rules.get(d);if(r.a===b.dataset.a)return;
+  S.rules.set(d,b.dataset.a==='block'?{a:'block'}:{a:b.dataset.a,n:b.dataset.a==='raise'?cfg.raise:cfg.low})}render()};
+addEventListener('beforeunload',e=>{if(S.on&&changes()){e.preventDefault();e.returnValue=''}});
+load();
+</script></body></html>
