@@ -9,7 +9,6 @@ $discard,site=amazon.co.uk
 $discard,site=amazon.com
 $discard,site=amazon.in
 $discard,site=anthropic.com
-$discard,site=apnews.com
 $discard,site=appbrain.com
 $discard,site=apps.apple.com
 $discard,site=aptoide.com
