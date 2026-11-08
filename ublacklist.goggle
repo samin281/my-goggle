@@ -41,6 +41,7 @@ $discard,site=softonic.com
 $discard,site=softpedia.com
 $discard,site=soundcloud.com
 $discard,site=spotify.com
+$discard,site=threads.com
 $discard,site=tiktok.com
 $discard,site=tubitv.com
 $discard,site=tv.apple.com
