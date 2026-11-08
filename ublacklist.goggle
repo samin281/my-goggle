@@ -71,7 +71,7 @@ $boost=1,site=elevenforum.com
 $boost=1,site=f-droid.org
 $boost=1,site=forum.vivaldi.net
 $boost=2,site=geeksforgeeks.org
-$boost=3,site=github.com
+$boost=2,site=github.com
 $boost=2,site=gitlab.com
 $boost=2,site=medium.com
 $boost=1,site=stackoverflow.com
