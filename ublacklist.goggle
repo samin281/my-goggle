@@ -4,6 +4,7 @@
 ! author: me
 
 ! ===== My site rules (Block / Lower / Raise) =====
+$discard,site=abc.com
 $discard,site=alternativeto.net
 $discard,site=amazon.co.uk
 $discard,site=amazon.com
