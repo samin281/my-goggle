@@ -65,7 +65,7 @@ $downrank=3,site=web.archive.org
 $downrank=3,site=wikihow.com
 $boost=1,site=apkmirror.com
 $boost=1,site=byjus.com
-$boost=2,site=codeberg.org
+$boost=1,site=codeberg.org
 $boost=1,site=discuss.grapheneos.org
 $boost=1,site=elevenforum.com
 $boost=1,site=f-droid.org
