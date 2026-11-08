@@ -1,0 +1,57 @@
+name: Submit goggle to Brave
+
+on:
+  push:
+    branches: [main]
+    paths: ['ublacklist.goggle']
+  workflow_dispatch:
+
+# If you save twice quickly, only the latest run submits.
+concurrency:
+  group: submit-goggle
+  cancel-in-progress: true
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait until GitHub's raw URL serves the new file
+        run: |
+          RAW='https://raw.githubusercontent.com/samin281/my-goggle/refs/heads/main/ublacklist.goggle'
+          ok=0
+          for i in $(seq 1 20); do
+            curl -fsSL "$RAW" -o remote.goggle || true
+            if cmp -s remote.goggle ublacklist.goggle; then ok=1; break; fi
+            echo "Raw URL still serves the old file ($i/20), waiting 30s..."
+            sleep 30
+          done
+          if [ "$ok" != 1 ]; then
+            echo "Raw URL never matched the repo file. Re-run this workflow in a few minutes."
+            exit 1
+          fi
+          echo "Raw URL is up to date."
+          sleep 15
+
+      - name: Submit to Brave
+        run: |
+          URL='https://search.brave.com/api/goggles/submit?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsamin281%2Fmy-goggle%2Frefs%2Fheads%2Fmain%2Fublacklist.goggle'
+          for try in 1 2 3; do
+            code=$(curl -sS -o resp.txt -w '%{http_code}' -X POST "$URL" \
+              -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:159.0) Gecko/20100101 Firefox/159.0' \
+              -H 'Accept: */*' \
+              -H 'Accept-Language: en-US,en;q=0.9' \
+              -H 'Referer: https://search.brave.com/goggles/create' \
+              -H 'Origin: https://search.brave.com' \
+              -H 'Content-Length: 0' || echo 000)
+            echo "Attempt $try: HTTP $code"
+            cat resp.txt; echo
+            if [ "$code" -ge 200 ] && [ "$code" -lt 300 ]; then
+              echo "Brave accepted the request."
+              exit 0
+            fi
+            sleep 20
+          done
+          echo "Brave did not accept the request after 3 attempts."
+          exit 1
