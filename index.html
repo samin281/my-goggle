@@ -83,7 +83,11 @@ const BRAVE='https://search.brave.com/api/goggles/submit?url=';let subTok=0;
 const setSub=t=>{const e=$('#sub');if(e)e.textContent=t};
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 async function sendBrave(){await fetch(BRAVE+encodeURIComponent(rawUrl()),{method:'POST',mode:'no-cors',credentials:'omit'})}
-async function manualSend(){try{await sendBrave();setSub('Sent to Brave. Its reply can’t be read from this page, so check a changed site in a goggle search.')}catch(e){setSub('Brave’s servers don’t let other sites read their reply, so this browser error ('+e.message+') usually still means the request went through. Search a changed site to confirm; if nothing changed, use Open Brave submit page.')}}
+const SENT='Sent to Brave ✓ Its reply can’t be read from this page, so check a changed site in a goggle search. If nothing changed, use Open Brave submit page.';
+async function manualSend(){
+ if(navigator.onLine===false){setSub('You appear to be offline. Try again when you’re connected.');return}
+ try{await sendBrave()}catch(e){console.warn('Brave hides its reply from other sites, so the browser reports an error here even though the request goes out:',e)}
+ setSub(SENT)}
 async function autoSubmit(text){const me=++subTok;
  for(let i=1;i<=20;i++){if(me!==subTok)return;
   try{const r=await fetch(rawUrl(),{cache:'no-store'});if(r.ok&&(await r.text())===text){setSub('GitHub is up to date — sending to Brave…');await manualSend();return}}catch{}
