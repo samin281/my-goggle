@@ -142,9 +142,9 @@ async function save(){
   const body={message:'Update goggle rules via Goggle Manager',content:b64(text),branch:cfg.branch};if(S.sha)body.sha=S.sha;
   const r=await(await gh(fp(),{method:'PUT',headers:{...H(),'Content-Type':'application/json'},body:JSON.stringify(body)})).json();
   S.sha=r.content.sha;S.rest=rest;countRest();S.orig=new Map([...S.rules].map(([d,x])=>[d,{...x}]));
-  msg(`Saved to GitHub ✓${n?` (removed ${n} conflicting block${n>1?'s':''} from the big lists so Lower/Raise take effect)`:''}<br>Brave doesn’t re-check goggles on its own, so this page sends the update once GitHub has published it.<br><b id="sub">Starting…</b><br><button id="sb">Submit to Brave now</button><button id="cp">Copy raw URL</button><a href="https://search.brave.com/goggles/create" target="_blank" rel="noopener"><button>Open Brave submit page</button></a>`,'ok',true);
+  msg(`Saved to GitHub ✓${n?` (removed ${n} conflicting block${n>1?'s':''} from the big lists so Lower/Raise take effect)`:''}<br>Brave doesn’t re-check goggles on its own, so this page sends the update once GitHub has published it.<br><b id="sub">Starting…</b><br><button id="subnow">Submit to Brave now</button><button id="cp">Copy raw URL</button><a href="https://search.brave.com/goggles/create" target="_blank" rel="noopener"><button>Open Brave submit page</button></a>`,'ok',true);
   $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(rawUrl());$('#cp').textContent='Copied ✓'}catch{prompt('Copy this URL',rawUrl())}};
-  $('#sb').onclick=manualSend;autoSubmit(text);
+  $('#subnow').onclick=manualSend;autoSubmit(text);
  }catch(e){msg('Save failed: '+e.message+(e.status===409||e.status===422?' — the file changed on GitHub; tap Reload (your edits will be lost).':''),'err')}
  btn.textContent='Save to GitHub';render();
 }
